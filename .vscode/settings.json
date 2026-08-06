@@ -1,0 +1,4 @@
+{
+  "task.allowAutomaticTasks": "always",
+  "git.autofetch": true
+}
