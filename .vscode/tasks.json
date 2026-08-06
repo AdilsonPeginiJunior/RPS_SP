@@ -2,9 +2,9 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Git: Push current branch",
+      "label": "Git: Push if needed",
       "type": "shell",
-      "command": "git push",
+      "command": "python .vscode/push-if-needed.py",
       "problemMatcher": [],
       "runOptions": {
         "runOn": "folderOpen"
