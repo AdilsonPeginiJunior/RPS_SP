@@ -1,0 +1,24 @@
+ # Arquivos sensíveis e artefatos locais
+RPS_SP.xlsx
+RPS_SP.txt
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+
+# Pasta de descarte local
+descartar/
+
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Sistema/OS
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log
