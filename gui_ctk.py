@@ -220,41 +220,41 @@ class GerarRPSApp(ctk.CTk):
 
         ctk.CTkLabel(form_frame, text="Data do recebimento:").pack(anchor="w", padx=5)
         self.data_recibo = DatePickerFrame(form_frame)
-        self.data_recibo.pack(fill="x", padx=5, pady=(0, 10))
+        self.data_recibo.pack(fill="x", padx=5, pady=(0, 4))
 
         ctk.CTkLabel(form_frame, text="Valor (R$):").pack(anchor="w", padx=5)
         self.valor_entry = ctk.CTkEntry(form_frame, placeholder_text="0,00")
-        self.valor_entry.pack(fill="x", padx=5, pady=(0, 10))
+        self.valor_entry.pack(fill="x", padx=5, pady=(0, 4))
 
         ctk.CTkLabel(form_frame, text="CPF Pagador:").pack(anchor="w", padx=5)
         self.cpf_pagador_cb = ctk.CTkComboBox(
             form_frame, values=[], command=self.on_pagador_selected
         )
-        self.cpf_pagador_cb.pack(fill="x", padx=5, pady=(0, 10))
+        self.cpf_pagador_cb.pack(fill="x", padx=5, pady=(0, 4))
         self.cpf_pagador_cb.set("")
 
         ctk.CTkLabel(form_frame, text="CPF do Beneficiário:").pack(anchor="w", padx=5)
         self.cpf_beneficiario_cb = ctk.CTkComboBox(form_frame, values=[])
-        self.cpf_beneficiario_cb.pack(fill="x", padx=5, pady=(0, 10))
+        self.cpf_beneficiario_cb.pack(fill="x", padx=5, pady=(0, 4))
         self.cpf_beneficiario_cb.set("")
 
         ctk.CTkLabel(form_frame, text="Descrição/Observações (Sessões):").pack(
             anchor="w", padx=5
         )
         self.sessoes_picker = MultiDatePickerFrame(form_frame)
-        self.sessoes_picker.pack(fill="x", padx=5, pady=(0, 10))
+        self.sessoes_picker.pack(fill="x", padx=5, pady=(0, 4))
 
         btn_frame = ctk.CTkFrame(form_frame, fg_color="transparent")
-        btn_frame.pack(fill="x", pady=10)
+        btn_frame.pack(fill="x", pady=4)
         ctk.CTkButton(
             btn_frame, text="Novo Recibo", command=self.clear_form,
-        ).pack(fill="x", padx=5, pady=(0, 5))
+        ).pack(side="left", fill="x", expand=True, padx=(5, 2))
         ctk.CTkButton(
             btn_frame, text="Salvar Recibo", command=self.save_recibo, fg_color="green",
-        ).pack(fill="x", padx=5, pady=(0, 5))
+        ).pack(side="left", fill="x", expand=True, padx=2)
         ctk.CTkButton(
             btn_frame, text="Limpar Formulário", command=self.clear_form, fg_color="gray",
-        ).pack(fill="x", padx=5)
+        ).pack(side="left", fill="x", expand=True, padx=(2, 5))
 
         list_frame = ctk.CTkFrame(container)
         list_frame.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
@@ -305,12 +305,13 @@ class GerarRPSApp(ctk.CTk):
 
         self.pagador_map = {
             f"{c.get('Client Name', '')} - {format_cpf_cnpj_display(c.get('Client CPF/CNPJ', ''))}": c
-            for c in clientes if c.get("Client CPF/CNPJ")
+            for c in sorted(clientes, key=lambda c: c.get("Client Name", "").casefold())
+            if c.get("Client CPF/CNPJ")
         }
         self.cpf_pagador_cb.configure(values=list(self.pagador_map.keys()))
 
         beneficiarios: dict[str, dict] = {}
-        for cliente in clientes:
+        for cliente in sorted(clientes, key=lambda c: c.get("Nome do Paciente", "").casefold()):
             patient_cpf = cliente.get("CPF do Paciente", "")
             if not patient_cpf:
                 continue
