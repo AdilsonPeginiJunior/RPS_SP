@@ -1,6 +1,14 @@
  # Arquivos sensíveis e artefatos locais
 RPS_SP.xlsx
 RPS_SP.txt
+*.rps.txt
+*_rps.xlsx
+clientes.json
+cliente_novo*.txt
+.rps_sp_settings.json
+HistoricoPacienteFem.txt
+HistoricoPacienteMasc.txt
+MCSP*.txt
 
 # Ambientes virtuais
 .venv/
@@ -8,7 +16,7 @@ venv/
 env/
 
 # Pasta de descarte local
-descartar/
+Descarte/
 
 # Cache Python
 __pycache__/
