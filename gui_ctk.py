@@ -359,13 +359,10 @@ class GerarRPSApp(ctk.CTk):
             return
 
         patient_cliente = self.beneficiario_map.get(beneficiario_label, cliente)
-        patient_name = patient_cliente.get("Nome do Paciente", "")
-        patient_cpf = patient_cliente.get("CPF do Paciente", "")
         responsible_cpf = cliente.get("Client CPF/CNPJ", "")
 
-        patient_database = core._load_patient_database()
-        service_description = core._format_patient_history(
-            descricao, patient_name, patient_cpf, patient_database, responsible_cpf
+        service_description = core.format_patient_history_for_record(
+            descricao, patient_cliente
         )
 
         recibo = {

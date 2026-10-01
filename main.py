@@ -909,24 +909,18 @@ def _load_patient_database() -> dict[str, dict[str, str]]:
     return database
 
 
-def _format_patient_history(
+def _apply_patient_history_template(
     source_description: str,
-    patient_name: str,
-    patient_cpf: str,
-    patient_database: dict[str, dict[str, str]],
-    responsible_cpf: str = "",
+    patient: dict[str, str],
+    patient_name: str = "",
+    patient_cpf: str = "",
 ) -> str:
-    patient = patient_database.get(f"cpf:{clean_digits(patient_cpf)}")
-    if patient is None:
-        patient = patient_database.get(f"nome:{patient_name.casefold()}")
-    if patient is None and not patient_name and not patient_cpf:
-        patient = patient_database.get(f"cpf:{clean_digits(responsible_cpf)}")
-    if patient is None or patient.get("sexo do paciente") not in PATIENT_HISTORY_TEMPLATES:
+    """Aplica o modelo de histórico (Fem/Masc) de um registro de paciente já conhecido."""
+    sex = patient.get("sexo do paciente")
+    if sex not in PATIENT_HISTORY_TEMPLATES:
         return source_description
 
-    sex = patient["sexo do paciente"]
-    template_path = PATIENT_HISTORY_TEMPLATES[sex]
-    template = read_text_file(template_path)
+    template = read_text_file(PATIENT_HISTORY_TEMPLATES[sex])
     patient_name = patient_name or normalize_text(patient.get("Nome do Paciente", ""))
     patient_cpf = patient_cpf or normalize_text(patient.get("CPF do Paciente", ""))
     replacements = {
@@ -948,6 +942,29 @@ def _format_patient_history(
         template,
     )
     return template
+
+
+def format_patient_history_for_record(source_description: str, patient: dict[str, str]) -> str:
+    """Gera a descrição do serviço a partir de um registro de cliente já selecionado
+    (ex.: GUI), usando diretamente o campo 'sexo do paciente' do registro."""
+    return _apply_patient_history_template(source_description, patient)
+
+
+def _format_patient_history(
+    source_description: str,
+    patient_name: str,
+    patient_cpf: str,
+    patient_database: dict[str, dict[str, str]],
+    responsible_cpf: str = "",
+) -> str:
+    patient = patient_database.get(f"cpf:{clean_digits(patient_cpf)}")
+    if patient is None:
+        patient = patient_database.get(f"nome:{patient_name.casefold()}")
+    if patient is None and not patient_name and not patient_cpf:
+        patient = patient_database.get(f"cpf:{clean_digits(responsible_cpf)}")
+    if patient is None:
+        return source_description
+    return _apply_patient_history_template(source_description, patient, patient_name, patient_cpf)
 
 
 def _apply_responsible_addresses(df: pd.DataFrame) -> pd.DataFrame:
