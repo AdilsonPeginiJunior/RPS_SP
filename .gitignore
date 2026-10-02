@@ -4,6 +4,7 @@ RPS_SP.txt
 *.rps.txt
 *_rps.xlsx
 clientes.json
+recibos.json
 cliente_novo*.txt
 .rps_sp_settings.json
 HistoricoPacienteFem.txt

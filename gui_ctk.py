@@ -2,12 +2,14 @@
 XLSX/TXT de RPS e gerenciar o cadastro de clientes (clientes.json)."""
 from __future__ import annotations
 
+from datetime import datetime
 from tkinter import filedialog, messagebox
 
 import customtkinter as ctk
 
 import main as core
 from clientes_storage import ClientesStorage
+from recibos_storage import RecibosStorage
 from ui_widgets import DatePickerFrame, MultiDatePickerFrame
 
 ctk.set_appearance_mode("dark")
@@ -176,7 +178,8 @@ class GerarRPSApp(ctk.CTk):
         self.title("Gerador de Lote RPS - São Paulo")
         self.geometry("1100x680")
 
-        self.recibos: list[dict] = []
+        self.recibos_storage = RecibosStorage(core.RECEIPTS_DATABASE_PATH)
+        self.recibos: list[dict] = self.recibos_storage.load_recibos()
         self.editing_index: int | None = None
         self.pagador_map: dict[str, dict] = {}
         self.beneficiario_map: dict[str, dict] = {}
@@ -194,6 +197,9 @@ class GerarRPSApp(ctk.CTk):
 
         self._build_widgets()
         self.refresh_clientes_options()
+        self._refresh_recibos_list()
+        if self.recibos:
+            self.status_var.set(f"{len(self.recibos)} recibo(s) carregado(s) de recibos.json.")
 
     def _build_widgets(self) -> None:
         self.grid_columnconfigure(0, weight=1)
@@ -269,7 +275,9 @@ class GerarRPSApp(ctk.CTk):
         ctk.CTkLabel(settings_frame, text="Inscrição municipal:").grid(
             row=0, column=0, sticky="w", padx=10, pady=(10, 0)
         )
-        ctk.CTkEntry(settings_frame, textvariable=self.municipal_registration_var).grid(
+        ctk.CTkEntry(
+            settings_frame, textvariable=self.municipal_registration_var, state="readonly"
+        ).grid(
             row=1, column=0, sticky="ew", padx=10, pady=(0, 10)
         )
         ctk.CTkLabel(settings_frame, text="Primeiro número do RPS:").grid(
@@ -394,6 +402,7 @@ class GerarRPSApp(ctk.CTk):
         else:
             self.recibos.append(recibo)
 
+        self.recibos_storage.save_recibos(self.recibos)
         self.clear_form()
         self._refresh_recibos_list()
         self.status_var.set(f"{len(self.recibos)} recibo(s) na lista.")
@@ -440,6 +449,7 @@ class GerarRPSApp(ctk.CTk):
     def delete_recibo(self, index: int) -> None:
         if messagebox.askyesno("Confirmar", "Remover este recibo?", parent=self):
             self.recibos.pop(index)
+            self.recibos_storage.save_recibos(self.recibos)
             if self.editing_index == index:
                 self.clear_form()
             self._refresh_recibos_list()
@@ -461,7 +471,8 @@ class GerarRPSApp(ctk.CTk):
             )
             return
 
-        municipal_registration = self.municipal_registration_var.get().strip()
+        municipal_registration = core.load_municipal_registration().strip()
+        self.municipal_registration_var.set(municipal_registration)
         if not municipal_registration:
             messagebox.showwarning(
                 "Inscrição municipal necessária",
@@ -496,7 +507,10 @@ class GerarRPSApp(ctk.CTk):
             )
             rows = [
                 {key: value for key, value in recibo.items() if not key.startswith("_")}
-                for recibo in self.recibos
+                for recibo in sorted(
+                    self.recibos,
+                    key=lambda r: datetime.strptime(r["Issue Date"], "%d/%m/%Y"),
+                )
             ]
             dataframe = core.pd.DataFrame(rows, columns=core.EXPECTED_COLUMNS)
             dataframe = core.assign_rps_numbers(dataframe, first_rps_number)

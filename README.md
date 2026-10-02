@@ -54,8 +54,8 @@ Na tela **Gerador de Arquivos RPS - São Paulo**:
 
 1. Preencha a data do recebimento, o valor, o **CPF Pagador** e o **CPF do Beneficiário** (ambos selecionados a partir do cadastro de clientes).
 2. Clique em **Selecionar Datas das Sessões** para gerar a descrição automaticamente.
-3. Clique em **Salvar Recibo** — o recibo entra na lista **Recibos Salvos**, onde pode ser editado ou removido antes da geração final.
-4. Informe a inscrição municipal e o primeiro número de RPS, e clique em **Gerar XLSX e TXT RPS**.
+3. Clique em **Salvar Recibo** — o recibo entra na lista **Recibos Salvos** (persistida em `recibos.json` e recarregada na próxima inicialização), onde pode ser editado ou removido antes da geração final.
+4. Informe o primeiro número de RPS e clique em **Gerar XLSX e TXT RPS**. Os recibos são ordenados pela data de recebimento antes de numerar e gerar os arquivos. A inscrição municipal é somente leitura e vem de `municipal_registration` em `.rps_sp_settings.json`.
 
 O botão **Cadastro de Clientes** abre a tela de CRUD sobre `clientes.json`, usada para popular os combos de pagador/beneficiário e os dados de endereço/e-mail do recibo.
 
@@ -76,6 +76,7 @@ Ao executar, o script gera um arquivo com o mesmo nome base do Excel e extensão
 - `main.py`: validação, conversão e geração dos arquivos de RPS; também expõe as funções reaproveitadas pela GUI.
 - `gui_ctk.py`: GUI CustomTkinter (cadastro manual de recibos e cadastro de clientes).
 - `clientes_storage.py`: CRUD sobre `clientes.json` usado pela tela de Cadastro de Clientes.
+- `recibos_storage.py`: persistência dos recibos em `recibos.json` e importação de um TXT de RPS já gerado (`parse_rps_txt`).
 - `ui_widgets.py`: widgets reutilizáveis (seletor de data única e seletor de múltiplas datas de sessão).
 - `tests/`: testes automatizados.
 
@@ -83,7 +84,7 @@ Ao executar, o script gera um arquivo com o mesmo nome base do Excel e extensão
 
 Os arquivos abaixo contêm dados reais de clientes/pacientes ou configurações locais e **nunca devem ser commitados** (já estão listados no `.gitignore`):
 
-- `clientes.json`, `.rps_sp_settings.json`
+- `clientes.json`, `recibos.json`, `.rps_sp_settings.json`
 - `cliente_novo*.txt`, `MCSP*.txt`
 - `HistoricoPacienteFem.txt`, `HistoricoPacienteMasc.txt` (contêm dados bancários do prestador)
 
