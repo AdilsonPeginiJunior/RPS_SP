@@ -264,7 +264,13 @@ class GerarRPSApp(ctk.CTk):
 
         list_frame = ctk.CTkFrame(container)
         list_frame.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
-        ctk.CTkLabel(list_frame, text="Recibos Salvos").pack(pady=5)
+        list_header = ctk.CTkFrame(list_frame, fg_color="transparent")
+        list_header.pack(fill="x", padx=5, pady=5)
+        ctk.CTkLabel(list_header, text="Recibos Salvos").pack(side="left")
+        ctk.CTkButton(
+            list_header, text="Excluir todos", width=100, fg_color="red",
+            command=self.delete_all_recibos,
+        ).pack(side="right")
         self.list_scroll = ctk.CTkScrollableFrame(list_frame)
         self.list_scroll.pack(fill="both", expand=True, padx=5, pady=5)
 
@@ -454,6 +460,23 @@ class GerarRPSApp(ctk.CTk):
                 self.clear_form()
             self._refresh_recibos_list()
             self.status_var.set(f"{len(self.recibos)} recibo(s) na lista.")
+
+    def delete_all_recibos(self) -> None:
+        if not self.recibos:
+            return
+        if not messagebox.askyesno(
+            "Confirmar exclusão",
+            f"Excluir todos os {len(self.recibos)} recibos salvos?",
+            parent=self,
+        ):
+            return
+
+        self.recibos_storage.save_recibos([])
+        self.recibos.clear()
+        if self.editing_index is not None:
+            self.clear_form()
+        self._refresh_recibos_list()
+        self.status_var.set("0 recibo(s) na lista.")
 
     def clear_form(self) -> None:
         self.editing_index = None
