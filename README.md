@@ -15,6 +15,8 @@ Aplicação Python que cadastra recibos (manualmente ou a partir de um TXT), cri
 
 ## Instalação
 
+O projeto está configurado para Python 3.15 64-bit. Mantenha os comandos abaixo usando um interpretador Python 3.15 de 64 bits.
+
 Recomenda-se usar um ambiente virtual:
 
 ```powershell
@@ -99,4 +101,3 @@ Para executar os testes:
 ```powershell
 python -m unittest discover -s tests -v
 ```
-
